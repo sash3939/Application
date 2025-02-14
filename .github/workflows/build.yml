@@ -8,7 +8,7 @@ on:
       - '*'
 env:
     REGISTRY: docker.io
-    IMAGE_NAME: ${{ github.event.repository.name }}
+    IMAGE_NAME: ${{ github.repository }}
 jobs:
   my_build_job:
     runs-on: ubuntu-latest
@@ -25,8 +25,8 @@ jobs:
 
       - name: Сборка Docker-образа
         run: |
-          docker build . --file Dockerfile --tag ${{ env.IMAGE_NAME }}: ${{ CI_COMMIT_SHA }}
-          docker tag ${{ env.IMAGE_NAME }}: ${{ CI_COMMIT_SHA }} ${{ secrets.USER_DOCKER_HUB }}/${{ env.IMAGE_NAME }}: ${{ CI_COMMIT_SHA }}
+          docker build . --file Dockerfile --tag ${{ env.IMAGE_NAME }}:latest
+          docker tag ${{ env.IMAGE_NAME }}:latest ${{ secrets.USER_DOCKER_HUB }}/${{ env.IMAGE_NAME }}:latest
       - name: Push Docker-образа в Docker Hub
         run: |
-          docker push ${{ secrets.USER_DOCKER_HUB }}/${{ env.IMAGE_NAME }}: ${{ CI_COMMIT_SHA }}
+          docker push ${{ secrets.USER_DOCKER_HUB }}/${{ env.IMAGE_NAME }}:latest
