@@ -49,4 +49,4 @@ jobs:
           kubectl config view
           kubectl get nodes
           kubectl get pods --all-namespaces
-          kubectl create deployment nginx --image=sash39/nginx:latest
+          kubectl apply deployment ${{ secrets.USER_DOCKER_HUB }}/${{ env.IMAGE_NAME }}:v.2.0.0
