@@ -2,6 +2,8 @@ name: Сборка Docker-образа
 
 on:
   push:
+    tags:
+      - 'v*'
     branches:
       - '*'
 jobs:
@@ -20,9 +22,12 @@ jobs:
 
       - name: Сборка Docker-образа
         run: |
-          docker build . --file Dockerfile --tag nginx:v.1.0.0
-          docker tag nginx:latest ${{ secrets.USER_DOCKER_HUB }}/nginx:latest
-
+#          docker build . --file Dockerfile --tag nginx:v.1.0.0
+#          docker tag nginx:latest ${{ secrets.USER_DOCKER_HUB }}/nginx:latest
+          docker build . --file Dockerfile --tag ${{ secrets.USER_DOCKER_HUB }}/nginx:${{ github.ref_name }}-${{ github.sha }}
+          docker tag ${{ secrets.USER_DOCKER_HUB }}/nginx:${{ github.ref_name }}-${{ github.sha }} ${{ secrets.USER_DOCKER_HUB }}/nginx:latest
       - name: Push Docker-образа в Docker Hub
         run: |
+#          docker push ${{ secrets.USER_DOCKER_HUB }}/nginx:latest
+          docker push ${{ secrets.USER_DOCKER_HUB }}/nginx:${{ github.ref_name }}-${{ github.sha }}
           docker push ${{ secrets.USER_DOCKER_HUB }}/nginx:latest
