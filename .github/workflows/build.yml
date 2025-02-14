@@ -8,7 +8,7 @@ on:
       - '*'
 env:
     REGISTRY: docker.io
-    IMAGE_NAME: ${{ github.repository }}
+    IMAGE_NAME: ${{ github.event.repository.name }}
 jobs:
   my_build_job:
     runs-on: ubuntu-latest
