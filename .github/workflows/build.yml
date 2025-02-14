@@ -4,8 +4,8 @@ on:
   push:
     tags:
       - 'v*'
-    branches:
-      - '*'
+#    branches:
+#      - '*'
 jobs:
   my_build_job:
     runs-on: ubuntu-latest
@@ -22,7 +22,7 @@ jobs:
 
       - name: Сборка Docker-образа
         run: |
-          docker build . --file Dockerfile --tag nginx:v.1.0.0
+          docker build . --file Dockerfile --tag nginx:latest
           docker tag nginx:latest ${{ secrets.USER_DOCKER_HUB }}/nginx:latest
       
       - name: Push Docker-образа в Docker Hub
