@@ -49,4 +49,4 @@ jobs:
           kubectl config view
           kubectl get nodes
           kubectl get pods --all-namespaces
-          kubectl apply deployment ${{ secrets.USER_DOCKER_HUB }}/${{ env.IMAGE_NAME }}:v.2.0.0
+          kubectl apply deployment nginx --image=${{ secrets.USER_DOCKER_HUB }}/${{ env.IMAGE_NAME }}:v.2.0.0
