@@ -49,4 +49,7 @@ jobs:
           kubectl config view
           kubectl get nodes
           kubectl get pods --all-namespaces
+          export K8S_NAMESPACE="diplom"
+          kubectl apply -f app.yaml 
           kubectl apply deployment nginx --image=${{ secrets.USER_DOCKER_HUB }}/${{ env.IMAGE_NAME }}:v.2.0.0
+          ${{ secrets.USER_DOCKER_HUB }}/${{ env.K8S }}
