@@ -54,4 +54,4 @@ jobs:
           kubectl config view
           kubectl get nodes
           kubectl get pods --all-namespaces
-          kubectl create deployment nginx --image=sash39/nginx:v1.0.0
+          kubectl create deployment nginx --image=sash39/nginx:latest
