@@ -6,6 +6,9 @@ on:
       - 'v*'
     branches:
       - '*'
+env:
+    REGISTRY: docker.io
+    IMAGE_NAME: ${{ github.repository }}
 jobs:
   my_build_job:
     runs-on: ubuntu-latest
@@ -22,9 +25,9 @@ jobs:
 
       - name: Сборка Docker-образа
         run: |
-          docker build . --file Dockerfile --tag nginx:${CI_COMMIT_SHA}
-          docker tag nginx:${CI_COMMIT_SHA} ${{ secrets.USER_DOCKER_HUB }}/nginx:${CI_COMMIT_SHA}
+          docker build . --file Dockerfile --tag IMAGE_NAME: ${{ github.repository }}
+          docker tag IMAGE_NAME: ${{ github.repository }} ${{ secrets.USER_DOCKER_HUB }}/IMAGE_NAME: ${{ github.repository }}
       
       - name: Push Docker-образа в Docker Hub
         run: |
-          docker push ${{ secrets.USER_DOCKER_HUB }}/nginx:${CI_COMMIT_SHA}
+          docker push ${{ secrets.USER_DOCKER_HUB }}/IMAGE_NAME: ${{ github.repository }}
