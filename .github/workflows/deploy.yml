@@ -43,3 +43,10 @@ jobs:
         run: |
           yc managed-kubernetes cluster get-credentials --id "${YC_CLUSTER_ID}" --external
           kubectl get nodes
+      # Шаг 6: Деплой приложения
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl config view
+          kubectl get nodes
+          kubectl get pods --all-namespaces
+          kubectl create deployment nginx --image=sash39/nginx:1.0.0
