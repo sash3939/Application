@@ -47,12 +47,12 @@ jobs:
       # Шаг 6: Деплой приложения
       - name: Deploy to Kubernetes
         env:
-          K8S_NAMESPACE: "diplom"
+          K8S_NAMESPACE: "cicd"
           IMAGE_TAG: ${{ github.ref }}
         run: |
           kubectl config view
           kubectl get nodes
           kubectl get pods --all-namespaces
-          export K8S_NAMESPACE="diplom"
+          export K8S_NAMESPACE="cicd"
           envsubst < app.yaml | kubectl apply -n $K8S_NAMESPACE -f -
           kubectl set image deployment/deployment-nginx nginx=${{ secrets.USER_DOCKER_HUB }}/${{ env.IMAGE_NAME }}:${{ github.ref }} -n $K8S_NAMESPACE
