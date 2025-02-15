@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-
+    tags:
+      - 'v*'
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -47,10 +48,12 @@ jobs:
       - name: Deploy to Kubernetes
         env:
           K8S_NAMESPACE: "diplom"
+          IMAGE_TAG: ${{ github.ref }}
         run: |
           kubectl config view
           kubectl get nodes
           kubectl get pods --all-namespaces
           export K8S_NAMESPACE="diplom"
           envsubst < app.yaml | kubectl apply -n $K8S_NAMESPACE -f -
+          kubectl set image deployment/app.yaml nginx=${{ secrets.USER_DOCKER_HUB }}/${{ env.IMAGE_NAME }}:${{ github.ref }} -n $K8S_NAMESPACE
                   
