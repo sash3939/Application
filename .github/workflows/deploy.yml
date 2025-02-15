@@ -55,5 +55,4 @@ jobs:
           kubectl get pods --all-namespaces
           export K8S_NAMESPACE="diplom"
           envsubst < app.yaml | kubectl apply -n $K8S_NAMESPACE -f -
-          kubectl set image deployment/app.yaml nginx=${{ secrets.USER_DOCKER_HUB }}/${{ env.IMAGE_NAME }}:${{ github.ref }} -n $K8S_NAMESPACE
-                  
+          kubectl set image deployment/deployment-nginx nginx=${{ secrets.USER_DOCKER_HUB }}/${{ env.IMAGE_NAME }}:${{ github.ref }} -n $K8S_NAMESPACE
