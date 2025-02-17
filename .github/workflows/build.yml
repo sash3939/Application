@@ -22,10 +22,26 @@ jobs:
         with:
           username: ${{ secrets.USER_DOCKER_HUB }}
           password: ${{ secrets.MY_TOKEN_DOCKER_HUB }}
-
+      
+      - name: Определение тега образа
+        id: set_image_tag
+        run: |
+          if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
+            echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == refs/heads/* ]]; then
+            branch_name=${GITHUB_REF#refs/heads/}
+            echo "IMAGE_TAG=${branch_name}" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            tag_name=${GITHUB_REF#refs/tags/}
+            echo "IMAGE_TAG=${tag_name}" >> $GITHUB_ENV
+          else
+            echo "IMAGE_TAG=dev" >> $GITHUB_ENV
+          fi
+          echo "Используем тег: $IMAGE_TAG"
+      
       - name: Сборка Docker-образа
         run: |
-          docker build . --file Dockerfile --tag ${{ secrets.USER_DOCKER_HUB }}/${{ env.IMAGE_NAME }}:v.2.0.0
+          docker build . --file Dockerfile --tag ${{ secrets.USER_DOCKER_HUB }}/${{ env.IMAGE_NAME }}:$IMAGE_TAG
       - name: Push Docker-образа в Docker Hub
         run: |
-          docker push ${{ secrets.USER_DOCKER_HUB }}/${{ env.IMAGE_NAME }}:v.2.0.0
+          docker push ${{ secrets.USER_DOCKER_HUB }}/${{ env.IMAGE_NAME }}:$IMAGE_TAG
