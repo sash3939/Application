@@ -3,9 +3,13 @@ name: Deploy to Yandex Cloud Kubernetes
 on:
   push:
     branches:
-      - main
+      - '*'
     tags:
       - 'v*'
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: ${{ github.event.repository.name }}
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -20,7 +24,25 @@ jobs:
         run: |
           curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
           echo "${HOME}/yandex-cloud/bin" >> $GITHUB_PATH
-      # Шаг 3: Аутентификация в Yandex Cloud
+
+     # Шаг 3: Вычисление тега образа
+      - name: Set dynamic image tag
+        id: set_image_tag
+        run: |
+          if [[ "${GITHUB_REF}" == refs/heads/main ]]; then
+            echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == refs/heads/* ]]; then
+            branch_name=${GITHUB_REF#refs/heads/}
+            echo "IMAGE_TAG=${branch_name}" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            tag_name=${GITHUB_REF#refs/tags/}
+            echo "IMAGE_TAG=${tag_name}" >> $GITHUB_ENV
+          else
+            echo "IMAGE_TAG=dev" >> $GITHUB_ENV
+          fi
+          echo "Using IMAGE_TAG: $IMAGE_TAG"
+          
+      # Шаг 4: Аутентификация в Yandex Cloud
       - name: Authenticate in Yandex Cloud
         env:
           YC_SERVICE_ACCOUNT_KEY: ${{ secrets.YC_SERVICE_ACCOUNT_KEY }}
@@ -31,12 +53,12 @@ jobs:
           yc config set service-account-key yc-sa-key.json
           yc config set cloud-id "${YC_CLOUD_ID}"
           yc config set folder-id "${YC_FOLDER_ID}"
-      # Шаг 4: Установка kubectl
+      # Шаг 5: Установка kubectl
       - name: Install kubectl
         run: |
           sudo apt-get update
           sudo apt-get install -y kubectl
-      # Шаг 5: Настройка подключения к Kubernetes
+      # Шаг 6: Настройка подключения к Kubernetes
       - name: Configure kubectl
         env:
           YC_SERVICE_ACCOUNT_KEY: ${{ secrets.YC_SERVICE_ACCOUNT_KEY }}
@@ -44,7 +66,7 @@ jobs:
         run: |
           yc managed-kubernetes cluster get-credentials --id "${YC_CLUSTER_ID}" --external
           kubectl get nodes
-      # Шаг 6: Деплой приложения
+      # Шаг 7: Деплой приложения
       - name: Deploy to Kubernetes
         env:
           K8S_NAMESPACE: "diplom"
@@ -55,4 +77,4 @@ jobs:
           kubectl get pods --all-namespaces
           export K8S_NAMESPACE="diplom"
           envsubst < app.yaml | kubectl apply -n $K8S_NAMESPACE -f -
-          kubectl set image deployment/deployment-nginx nginx=${{ secrets.USER_DOCKER_HUB }}/${{ env.IMAGE_NAME }}:${{ github.ref }} -n $K8S_NAMESPACE
+          kubectl set image deployment/deployment-nginx nginx=${{ secrets.USER_DOCKER_HUB }}/${{ env.IMAGE_NAME }}:$IMAGE_TAG -n $K8S_NAMESPACE
