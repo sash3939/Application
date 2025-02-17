@@ -70,8 +70,9 @@ jobs:
       - name: Deploy to Kubernetes
         env:
           K8S_NAMESPACE: "diplom"
-          IMAGE_TAG: ${{ github.ref }}
+     #     IMAGE_TAG: ${{ github.ref }}
         run: |
+          echo "Deploying image: ${{ secrets.USER_DOCKER_HUB }}/${{ env.IMAGE_NAME }}:$IMAGE_TAG"
           kubectl config view
           kubectl get nodes
           kubectl get pods --all-namespaces
